@@ -88,7 +88,7 @@ public class Irc extends GrapePluginImpl
 
         for (ConfigSection channel : channels.values()) {
             if (channel.fetch("autojoin", boolean.class)) {
-                this.ircbot.joinChannel(channel.getSimpleName());
+                this.ircbot.joinChannel(channel.getSimpleName(), channel.fetch("password"));
             }
         }
 
@@ -98,45 +98,17 @@ public class Irc extends GrapePluginImpl
     @Chat
     public Boolean bridgeGameIrc (NetworkAction action, DestType desttype, Client client, String message, BigInteger data)
     {
-        String msg = null;
-
-        System.out.println("ta");
-
-        switch (action) {
-            case NETWORK_ACTION_CHAT_CLIENT:
-            case NETWORK_ACTION_CHAT_COMPANY:
-            case NETWORK_ACTION_GIVE_MONEY:
-            case NETWORK_ACTION_SERVER_MESSAGE:
-                return Boolean.TRUE;
-
-            case NETWORK_ACTION_COMPANY_JOIN:
-            case NETWORK_ACTION_COMPANY_NEW:
-            case NETWORK_ACTION_COMPANY_SPECTATOR:
-            case NETWORK_ACTION_JOIN:
-            case NETWORK_ACTION_LEAVE:
-                msg = message;
-                break;
-
-            case NETWORK_ACTION_NAME_CHANGE:
-                msg = String.format("*** %s is now known as %s", message, client.name);
-                break;
-
-            case NETWORK_ACTION_CHAT:
-                msg = String.format("<%s> %s", client.name, message);
-        }
-
-        if (msg == null) {
+        if (action != NetworkAction.NETWORK_ACTION_CHAT && desttype != DestType.DESTTYPE_BROADCAST) {
             return Boolean.TRUE;
         }
 
-        System.out.println(msg);
+        String msg = msg = String.format("<%s> %s", client.name, message);
 
         for (ConfigSection channel : channels.values()) {
             if (channel.fetch("chat.bridge", boolean.class)) {
                 this.ircbot.sendMessage(channel.getSimpleName(), msg);
             }
         }
-        
 
         return Boolean.TRUE;
     }
