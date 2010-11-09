@@ -16,6 +16,7 @@
 
     <modules>
         <module>irc/</module>
+        <module>password/</module>
     </modules>
 
     <build>

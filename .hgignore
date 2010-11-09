@@ -1,2 +1,7 @@
 target/
 ^plugins/
+\.orig\..*$
+\.orig$
+\.chg\..*$
+\.rej$
+\.conflict\~$
