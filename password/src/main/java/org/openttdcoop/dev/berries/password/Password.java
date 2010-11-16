@@ -51,7 +51,7 @@ public class Password extends GrapePluginImpl implements Runnable
     private void initConfig() throws IOException
     {
 	config.define("duration", 900000);
-	config.define("wordfile", "src/main/resources/dictionaries/words6.txt");
+	config.define("wordfile", "../berries/password/src/main/resources/dictionaries/words6.txt");
 	this.config.store();
     }
 
@@ -100,7 +100,6 @@ public class Password extends GrapePluginImpl implements Runnable
 	    LineNumberReader linereader = new LineNumberReader(reader);
 	    linereader.skip(last);
 	    maxWords = linereader.getLineNumber();
-	    System.out.println("Max words : " + maxWords);
 	    linereader.close();
 	    reader.close();
 	}
@@ -122,7 +121,6 @@ public class Password extends GrapePluginImpl implements Runnable
 	{
 	    File file = new File(filepath);
 	    int word = (int) (Math.random() * maxWords);
-	    System.out.println("Word : " + word);
 	    FileReader reader = new FileReader(file);
 	    LineNumberReader linereader = new LineNumberReader(reader);
 	    for (int i = 0; i < word; i++)
@@ -130,7 +128,6 @@ public class Password extends GrapePluginImpl implements Runnable
 		linereader.readLine();
 	    }
 	    pass = linereader.readLine();
-	    System.out.println("pass : " + pass);
 	    linereader.close();
 	    reader.close();
 	}
