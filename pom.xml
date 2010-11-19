@@ -17,6 +17,7 @@
     <modules>
         <module>irc/</module>
         <module>password/</module>
+        <module>commander</module>
     </modules>
 
     <build>
