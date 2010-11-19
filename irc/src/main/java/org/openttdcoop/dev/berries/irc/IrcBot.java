@@ -5,12 +5,16 @@
 
 package org.openttdcoop.dev.berries.irc;
 
+import org.openttdcoop.dev.grapes.enums.CommandAccess;
 import java.io.IOException;
+import java.util.EnumSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.jibble.pircbot.IrcException;
 import org.jibble.pircbot.PircBot;
+import org.jibble.pircbot.User;
 import org.openttdcoop.dev.grapes.config.ConfigSection;
+import org.openttdcoop.dev.grapes.spi.OpenTTDExtentions.IrcCommand;
 
 /**
  *
@@ -44,6 +48,28 @@ public class IrcBot extends PircBot
         }
     }
 
+    @Override
+    public void onPrivateMessage(String sender, String login, String hostname, String message)
+    {
+	if (message.startsWith(irc.getConfig().fetch("irc.cmdchar")))
+	{
+	    EnumSet access = EnumSet.noneOf(CommandAccess.class);
+	    access.add(CommandAccess.Private);
+	    boolean isOp = false;
+	    boolean rcon = false;
+	    for (String channel : irc.channels.keySet())
+	    {
+		ConfigSection config = irc.channels.get(channel);
+		boolean channelop = isOp(channel, sender);
+		if (channelop) isOp = true;
+		if (config.fetch("rcon.enabled", boolean.class) && (isOp || !config.fetch("rcon.oponly", boolean.class))) rcon = true;
+	    }
+	    if (isOp) access.add(CommandAccess.Op);
+	    if (rcon) access.add(CommandAccess.Rcon);
+	    this.irc.getPluginManager().invoke(IrcCommand.class, message.substring(1), null, sender, access);
+	    return;
+        }
+    }
 
     @Override
     public void onMessage(String channel, String sender, String login, String hostname, String message)
@@ -54,9 +80,15 @@ public class IrcBot extends PircBot
             return;
         }
 
-        /* TODO: create commands (using a tokenizer?) */
-        if (message.startsWith(irc.getConfig().fetch("irc.cmdchar"))) {
-            return;
+        if (message.startsWith(irc.getConfig().fetch("irc.cmdchar"))) 
+	{
+	    EnumSet access = EnumSet.noneOf(CommandAccess.class);
+	    access.add(CommandAccess.Channel);
+	    boolean isOp = isOp(channel, sender);
+	    if (isOp) access.add(CommandAccess.Op);
+	    if (config.fetch("rcon.enabled", boolean.class) && (isOp || !config.fetch("rcon.oponly", boolean.class))) access.add(CommandAccess.Rcon);
+	    this.irc.getPluginManager().invoke(IrcCommand.class, message.substring(1), channel, sender, access);
+	    return;
         }
 
         if (config.fetch("chat.bridge", boolean.class)) {
@@ -68,5 +100,19 @@ public class IrcBot extends PircBot
                 }
             }
         }
+    }
+
+    public boolean isOp(String channel, String nick)
+    {
+	User[] users = this.getUsers(channel);
+	for (User user : users)
+	{
+	    if (user.getNick().equals(nick))
+	    {
+		return user.isOp();
+	    }
+	}
+
+	return true;
     }
 }

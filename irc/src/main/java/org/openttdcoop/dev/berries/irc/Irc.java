@@ -74,7 +74,6 @@ public class Irc extends GrapePluginImpl
             example.define("console.debug", false, "bridge also debug messages");
             example.define("rcon.enabled", false);
             example.define("rcon.oponly", false);
-            example.define("rcon.channel", false, "if this is an rcon channel, every thing becomes an rcon command");
             example.define("ignorechar", "", "lines prefixed with this char will be ignored by everything this bot does\nleave empty to disable");
         }
 
@@ -136,5 +135,14 @@ public class Irc extends GrapePluginImpl
             Network net = gr.getNetwork();
             net.chatPublic(message);
             System.out.println("message sent?");
+    }
+
+    @IrcCommandReply
+    public Boolean commandReplyReceived(String channel, String sender, String message)
+    {
+	if (channel != null)
+	    this.ircbot.sendMessage(channel, message);
+	else this.ircbot.sendMessage(sender, message);
+	return true;
     }
 }
