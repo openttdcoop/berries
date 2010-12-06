@@ -11,7 +11,7 @@ import org.openttd.enums.DestType;
 import org.openttd.enums.NetworkAction;
 import org.openttd.network.Network;
 import org.openttdcoop.dev.grapes.Grapes;
-import org.openttdcoop.dev.grapes.PluginManager;
+import org.openttdcoop.dev.grapes.plugin.PluginManager;
 import org.openttdcoop.dev.grapes.config.ConfigSection;
 import org.openttdcoop.dev.grapes.spi.*;
 import org.openttdcoop.dev.grapes.spi.OpenTTDExtentions.*;

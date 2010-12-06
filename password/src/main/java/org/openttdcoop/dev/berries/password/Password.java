@@ -8,7 +8,7 @@ import java.io.RandomAccessFile;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.openttd.OpenTTD;
-import org.openttdcoop.dev.grapes.PluginManager;
+import org.openttdcoop.dev.grapes.plugin.PluginManager;
 import org.openttdcoop.dev.grapes.config.ConfigSection;
 import org.openttdcoop.dev.grapes.spi.*;
 import org.openttdcoop.dev.grapes.spi.OpenTTDExtentions.*;
