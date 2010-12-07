@@ -42,7 +42,7 @@ public class Irc extends GrapePluginImpl
     public boolean init ()
     {
         try {
-            initConifg();
+            initConfig();
         } catch (IOException ex) {
             Logger.getLogger(OpenTTD.class.getName()).log(Level.SEVERE, ex.getCause().getMessage(), ex.getCause());
         }
@@ -55,7 +55,7 @@ public class Irc extends GrapePluginImpl
         return true;
     }
 
-    private void initConifg () throws IOException
+    private void initConfig () throws IOException
     {
         config.define("irc.host", "irc.oftc.net");
         config.define("irc.port", 6667, "");
