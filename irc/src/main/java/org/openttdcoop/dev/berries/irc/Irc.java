@@ -14,6 +14,7 @@ import org.openttdcoop.dev.grapes.Grapes;
 import org.openttdcoop.dev.grapes.plugin.PluginManager;
 import org.openttdcoop.dev.grapes.config.ConfigSection;
 import org.openttdcoop.dev.grapes.spi.*;
+import org.openttdcoop.dev.grapes.spi.GrapeExtentionPoint.*;
 import org.openttdcoop.dev.grapes.spi.OpenTTDExtentions.*;
 
 /**
@@ -22,6 +23,12 @@ import org.openttdcoop.dev.grapes.spi.OpenTTDExtentions.*;
  */
 public class Irc extends GrapePluginImpl
 {
+    @InjectPluginManager
+    protected PluginManager pm;
+
+    @InjectPluginConfig
+    protected ConfigSection config;
+
     IrcBot ircbot;
 
     protected HashMap<String, ConfigSection> channels = new HashMap<String, ConfigSection>();
@@ -32,11 +39,8 @@ public class Irc extends GrapePluginImpl
     }
 
     @Override
-    public boolean init (PluginManager pm, ConfigSection config)
+    public boolean init ()
     {
-        this.pm     = pm;
-        this.config = config;
-
         try {
             initConifg();
         } catch (IOException ex) {

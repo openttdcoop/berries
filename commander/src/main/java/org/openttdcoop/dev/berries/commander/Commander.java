@@ -14,6 +14,7 @@ import org.openttd.enums.NetworkAction;
 import org.openttdcoop.dev.grapes.plugin.PluginManager;
 import org.openttdcoop.dev.grapes.config.ConfigSection;
 import org.openttdcoop.dev.grapes.spi.*;
+import org.openttdcoop.dev.grapes.spi.GrapeExtentionPoint.*;
 import org.openttdcoop.dev.grapes.spi.OpenTTDExtentions.*;
 
 /**
@@ -23,13 +24,17 @@ import org.openttdcoop.dev.grapes.spi.OpenTTDExtentions.*;
  */
 public class Commander extends GrapePluginImpl
 {
+    @InjectPluginManager
+    protected PluginManager pm;
+
+    @InjectPluginConfig
+    protected ConfigSection config;
+
     Commands commands = new Commands();
 
     @Override
-    public boolean init(PluginManager pm, ConfigSection config)
+    public boolean init()
     {
-	this.pm = pm;
-	this.config = config;
 	try
 	{
 	    initConfig();

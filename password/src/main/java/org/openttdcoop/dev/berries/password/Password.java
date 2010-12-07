@@ -11,6 +11,7 @@ import org.openttd.OpenTTD;
 import org.openttdcoop.dev.grapes.plugin.PluginManager;
 import org.openttdcoop.dev.grapes.config.ConfigSection;
 import org.openttdcoop.dev.grapes.spi.*;
+import org.openttdcoop.dev.grapes.spi.GrapeExtentionPoint.*;
 import org.openttdcoop.dev.grapes.spi.OpenTTDExtentions.*;
 
 /**
@@ -20,21 +21,25 @@ import org.openttdcoop.dev.grapes.spi.OpenTTDExtentions.*;
  */
 public class Password extends GrapePluginImpl implements Runnable
 {
+    @InjectPluginManager
+    protected PluginManager pm;
+
+    @InjectPluginConfig
+    protected ConfigSection config;
 
     /**
      * The total number of words(-1) in the file.
      */
     private int maxWords = 0;
+
     /**
      * Filepath containing the words used.
      */
     private String filepath = "";
 
     @Override
-    public boolean init(PluginManager pm, ConfigSection config)
+    public boolean init ()
     {
-	this.pm = pm;
-	this.config = config;
 	try
 	{
 	    initConfig();
@@ -66,7 +71,7 @@ public class Password extends GrapePluginImpl implements Runnable
 	    try
 	    {
 		String newpass = getNewPass();
-		this.getPluginManager().getGrapes().getNetwork().SEND_ADMIN_PACKET_ADMIN_RCON("set network.server_password " + newpass);
+		this.pm.getGrapes().getNetwork().SEND_ADMIN_PACKET_ADMIN_RCON("set network.server_password " + newpass);
 	    }
 	    catch (IOException e)
 	    {

@@ -31,16 +31,16 @@ public class IrcBot extends PircBot
 
     public void init ()
     {
-        this.setName(irc.getConfig().fetch("irc.nick"));
+        this.setName(irc.config.fetch("irc.nick"));
         this.setLogin("Grapes IRC Berry");
         this.setVersion("0.1");
-        this.setVerbose(irc.getConfig().fetch("irc.verbose", boolean.class));
+        this.setVerbose(irc.config.fetch("irc.verbose", boolean.class));
     }
 
     public void connect ()
     {
         try {
-            this.connect(irc.getConfig().fetch("irc.host"), irc.getConfig().fetch("irc.port", int.class));
+            this.connect(irc.config.fetch("irc.host"), irc.config.fetch("irc.port", int.class));
         } catch (IOException ex) {
             Logger.getLogger(IrcBot.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IrcException ex) {
@@ -51,7 +51,7 @@ public class IrcBot extends PircBot
     @Override
     public void onPrivateMessage(String sender, String login, String hostname, String message)
     {
-	if (message.startsWith(irc.getConfig().fetch("irc.cmdchar")))
+	if (message.startsWith(irc.config.fetch("irc.cmdchar")))
 	{
 	    EnumSet access = EnumSet.noneOf(CommandAccess.class);
 	    access.add(CommandAccess.Private);
@@ -66,7 +66,7 @@ public class IrcBot extends PircBot
 	    }
 	    if (isOp) access.add(CommandAccess.Op);
 	    if (rcon) access.add(CommandAccess.Rcon);
-	    this.irc.getPluginManager().invoke(IrcCommand.class, message.substring(1), null, sender, access);
+	    this.irc.pm.invoke(IrcCommand.class, message.substring(1), null, sender, access);
 	    return;
         }
     }
@@ -80,14 +80,14 @@ public class IrcBot extends PircBot
             return;
         }
 
-        if (message.startsWith(irc.getConfig().fetch("irc.cmdchar"))) 
+        if (message.startsWith(irc.config.fetch("irc.cmdchar")))
 	{
 	    EnumSet access = EnumSet.noneOf(CommandAccess.class);
 	    access.add(CommandAccess.Channel);
 	    boolean isOp = isOp(channel, sender);
 	    if (isOp) access.add(CommandAccess.Op);
 	    if (config.fetch("rcon.enabled", boolean.class) && (isOp || !config.fetch("rcon.oponly", boolean.class))) access.add(CommandAccess.Rcon);
-	    this.irc.getPluginManager().invoke(IrcCommand.class, message.substring(1), channel, sender, access);
+	    this.irc.pm.invoke(IrcCommand.class, message.substring(1), channel, sender, access);
 	    return;
         }
 
