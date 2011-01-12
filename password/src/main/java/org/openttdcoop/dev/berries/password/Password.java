@@ -71,7 +71,7 @@ public class Password extends GrapePluginImpl implements Runnable
 	    try
 	    {
 		String newpass = getNewPass();
-		this.pm.getGrapes().getNetwork().SEND_ADMIN_PACKET_ADMIN_RCON("set network.server_password " + newpass);
+        this.pm.getGrapes().getNetwork().sendAdminRcon("set network.server_password " + newpass);
 	    }
 	    catch (IOException e)
 	    {
