@@ -8,18 +8,17 @@ import java.io.RandomAccessFile;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.openttd.OpenTTD;
+import org.openttdcoop.dev.berries.openttd.spi.OpenTTDWelcome;
 import org.openttdcoop.dev.grapes.plugin.PluginManager;
 import org.openttdcoop.dev.grapes.config.ConfigSection;
 import org.openttdcoop.dev.grapes.spi.*;
-import org.openttdcoop.dev.grapes.spi.GrapeExtentionPoint.*;
-import org.openttdcoop.dev.grapes.spi.OpenTTDExtentions.*;
 
 /**
  * Password changer plugin to Grapes
  * Changes password from a given list on set intervals.
  * @author ODM
  */
-public class Password extends GrapePluginImpl implements Runnable
+public class Password extends GrapePluginImpl implements Runnable, OpenTTDWelcome
 {
     @InjectPluginManager
     protected PluginManager pm;
@@ -129,11 +128,10 @@ public class Password extends GrapePluginImpl implements Runnable
     /**
      * Starts the new thread for this berry once a connection is made.
      */
-    @Welcome
-    public Boolean startPasswords()
+    @Override
+    public void onOpenTTDWelcome()
     {
         System.out.println("Thread started");
         new Thread(this).start();
-        return true;
     }
 }
