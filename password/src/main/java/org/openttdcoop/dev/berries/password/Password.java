@@ -1,10 +1,16 @@
 package org.openttdcoop.dev.berries.password;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.io.RandomAccessFile;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.openttd.OpenTTD;
@@ -26,15 +32,8 @@ public class Password extends GrapePluginImpl implements Runnable, OpenTTDWelcom
     @InjectPluginConfig
     protected ConfigSection config;
 
-    /**
-     * The total number of words(-1) in the file.
-     */
-    private int maxWords = 0;
-
-    /**
-     * Filepath containing the words used.
-     */
-    private String filepath = "";
+    private List<String> passwords = new ArrayList<String>();
+    private String curPass = "";
 
     @Override
     public boolean init()
@@ -52,7 +51,7 @@ public class Password extends GrapePluginImpl implements Runnable, OpenTTDWelcom
     private void initConfig() throws IOException
     {
         config.define("duration", 900000);
-        config.define("wordfile", "../berries/password/src/main/resources/dictionaries/words6.txt");
+        config.define("wordfile", "dictionaries/words6.txt");
         this.config.store();
     }
 
@@ -78,23 +77,32 @@ public class Password extends GrapePluginImpl implements Runnable, OpenTTDWelcom
     }
 
     /**
-     * Determines the total number of words in the wordfile.
-     * Used to be able to pick a word at random.
+     * Read the words file and save the number of usable records.
      */
     private void setMaxLines()
     {
         try {
-            filepath = config.fetch("wordfile");
-            File file = new File(filepath);
-            RandomAccessFile randFile = new RandomAccessFile(file, "r");
-            long last = randFile.length();
-            randFile.close();
-            FileReader reader = new FileReader(file);
-            LineNumberReader linereader = new LineNumberReader(reader);
-            linereader.skip(last);
-            maxWords = linereader.getLineNumber();
-            linereader.close();
-            reader.close();
+            InputStream is = getClass().getClassLoader().getResourceAsStream(config.fetch("wordfile"));
+            System.out.println(is.toString());
+            InputStreamReader isr = new InputStreamReader(is);
+            BufferedReader br = new BufferedReader(isr);
+
+            
+            String line;
+
+            while ((line = br.readLine()) != null)
+            {
+                /* do not take epty passwords */
+                if (line.matches("^\\s*$")) {
+                    continue;
+                }
+
+                passwords.add(line);
+            }
+
+            br.close();
+            isr.close();
+            is.close();
         } catch (IOException e) {
             Logger.getLogger(OpenTTD.class.getName()).log(Level.WARNING, e.getMessage());
         }
@@ -106,23 +114,21 @@ public class Password extends GrapePluginImpl implements Runnable, OpenTTDWelcom
      */
     private String getNewPass()
     {
-        String pass = "";
+        Random r = new Random();
+        int randint = Math.abs(r.nextInt()) % passwords.size();
 
-        try {
-            File file = new File(filepath);
-            int word = (int) (Math.random() * maxWords);
-            FileReader reader = new FileReader(file);
-            LineNumberReader linereader = new LineNumberReader(reader);
-            for (int i = 0; i < word; i++) {
-                linereader.readLine();
-            }
-            pass = linereader.readLine();
-            linereader.close();
-            reader.close();
-        } catch (IOException e) {
-            Logger.getLogger(OpenTTD.class.getName()).log(Level.SEVERE, e.getMessage());
-        }
-        return pass;
+        curPass = passwords.get(randint);
+
+        return curPass;
+    }
+
+    /**
+     * Get the current Password.
+     * @return The current Password.
+     */
+    public String getCurrentPassword ()
+    {
+        return curPass;
     }
 
     /**
