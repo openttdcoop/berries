@@ -7,7 +7,7 @@
     <version>0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>berries</name>
+    <name>Berries</name>
     <url>http://dev.openttdcoop.org/projects/berries</url>
 
     <properties>
@@ -85,4 +85,34 @@
             <artifactId>grapes</artifactId>
         </dependency>
     </dependencies>
+
+    <distributionManagement>
+        <repository>
+            <uniqueVersion>false</uniqueVersion>
+            <id>openttdcoop-release</id>
+            <name>#openttdcoop release</name>
+            <url>http://nexus.dihedral.de/content/repositories/openttdcoop-release</url>
+        </repository>
+        <snapshotRepository>
+            <uniqueVersion>true</uniqueVersion>
+            <id>openttdcoop-snapshot</id>
+            <name>#openttdcoop snapshot</name>
+            <url>http://nexus.dihedral.de/content/repositories/openttdcoop-snapshot</url>
+        </snapshotRepository>
+        <downloadUrl>http://nexus.dihedral.de/content/groups/openttdcoop/</downloadUrl>
+    </distributionManagement>
+
+    <repositories>
+        <repository>
+            <id>openttdcoop</id>
+            <name>#openttdcoop</name>
+            <url>http://nexus.dihedral.de/content/groups/openttdcoop</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+    </repositories>
 </project>
