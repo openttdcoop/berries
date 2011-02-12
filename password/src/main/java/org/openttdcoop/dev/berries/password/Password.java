@@ -38,26 +38,23 @@ public class Password extends GrapePluginImpl implements Runnable
     private String filepath = "";
 
     @Override
-    public boolean init ()
+    public boolean init()
     {
-	try
-	{
-	    initConfig();
-	}
-	catch (IOException ex)
-	{
-	    Logger.getLogger(OpenTTD.class.getName()).log(Level.SEVERE, ex.getCause().getMessage(), ex.getCause());
-	}
-	setMaxLines();
+        try {
+            initConfig();
+        } catch (IOException ex) {
+            Logger.getLogger(OpenTTD.class.getName()).log(Level.SEVERE, ex.getCause().getMessage(), ex.getCause());
+        }
+        setMaxLines();
 
-	return true;
+        return true;
     }
 
     private void initConfig() throws IOException
     {
-	config.define("duration", 900000);
-	config.define("wordfile", "../berries/password/src/main/resources/dictionaries/words6.txt");
-	this.config.store();
+        config.define("duration", 900000);
+        config.define("wordfile", "../berries/password/src/main/resources/dictionaries/words6.txt");
+        this.config.store();
     }
 
     /**
@@ -66,26 +63,19 @@ public class Password extends GrapePluginImpl implements Runnable
     @Override
     public void run()
     {
-	while (true)
-	{
-	    try
-	    {
-		String newpass = getNewPass();
-        this.pm.getGrapes().getNetwork().sendAdminRcon("set network.server_password " + newpass);
-	    }
-	    catch (IOException e)
-	    {
-		Logger.getLogger(OpenTTD.class.getName()).log(Level.SEVERE, e.getMessage());
-	    }
-	    try
-	    {
-		Thread.sleep(Integer.parseInt(config.fetch("duration")));
-	    }
-	    catch (InterruptedException e)
-	    {
-		Logger.getLogger(OpenTTD.class.getName()).log(Level.WARNING, e.getMessage());
-	    }
-	}
+        while (true) {
+            try {
+                String newpass = getNewPass();
+                this.pm.getGrapes().getNetwork().sendAdminRcon("set network.server_password " + newpass);
+            } catch (IOException e) {
+                Logger.getLogger(OpenTTD.class.getName()).log(Level.SEVERE, e.getMessage());
+            }
+            try {
+                Thread.sleep(Integer.parseInt(config.fetch("duration")));
+            } catch (InterruptedException e) {
+                Logger.getLogger(OpenTTD.class.getName()).log(Level.WARNING, e.getMessage());
+            }
+        }
     }
 
     /**
@@ -94,24 +84,21 @@ public class Password extends GrapePluginImpl implements Runnable
      */
     private void setMaxLines()
     {
-	try
-	{
-	    filepath = config.fetch("wordfile");
-	    File file = new File(filepath);
-	    RandomAccessFile randFile = new RandomAccessFile(file, "r");
-	    long last = randFile.length();
-	    randFile.close();
-	    FileReader reader = new FileReader(file);
-	    LineNumberReader linereader = new LineNumberReader(reader);
-	    linereader.skip(last);
-	    maxWords = linereader.getLineNumber();
-	    linereader.close();
-	    reader.close();
-	}
-	catch (IOException e)
-	{
-	    Logger.getLogger(OpenTTD.class.getName()).log(Level.WARNING, e.getMessage());
-	}
+        try {
+            filepath = config.fetch("wordfile");
+            File file = new File(filepath);
+            RandomAccessFile randFile = new RandomAccessFile(file, "r");
+            long last = randFile.length();
+            randFile.close();
+            FileReader reader = new FileReader(file);
+            LineNumberReader linereader = new LineNumberReader(reader);
+            linereader.skip(last);
+            maxWords = linereader.getLineNumber();
+            linereader.close();
+            reader.close();
+        } catch (IOException e) {
+            Logger.getLogger(OpenTTD.class.getName()).log(Level.WARNING, e.getMessage());
+        }
     }
 
     /**
@@ -120,27 +107,23 @@ public class Password extends GrapePluginImpl implements Runnable
      */
     private String getNewPass()
     {
-	String pass = "";
+        String pass = "";
 
-	try
-	{
-	    File file = new File(filepath);
-	    int word = (int) (Math.random() * maxWords);
-	    FileReader reader = new FileReader(file);
-	    LineNumberReader linereader = new LineNumberReader(reader);
-	    for (int i = 0; i < word; i++)
-	    {
-		linereader.readLine();
-	    }
-	    pass = linereader.readLine();
-	    linereader.close();
-	    reader.close();
-	}
-	catch (IOException e)
-	{
-	    Logger.getLogger(OpenTTD.class.getName()).log(Level.SEVERE, e.getMessage());
-	}
-	return pass;
+        try {
+            File file = new File(filepath);
+            int word = (int) (Math.random() * maxWords);
+            FileReader reader = new FileReader(file);
+            LineNumberReader linereader = new LineNumberReader(reader);
+            for (int i = 0; i < word; i++) {
+                linereader.readLine();
+            }
+            pass = linereader.readLine();
+            linereader.close();
+            reader.close();
+        } catch (IOException e) {
+            Logger.getLogger(OpenTTD.class.getName()).log(Level.SEVERE, e.getMessage());
+        }
+        return pass;
     }
 
     /**
@@ -149,8 +132,8 @@ public class Password extends GrapePluginImpl implements Runnable
     @Welcome
     public Boolean startPasswords()
     {
-	System.out.println("Thread started");
-	new Thread(this).start();
-	return true;
+        System.out.println("Thread started");
+        new Thread(this).start();
+        return true;
     }
 }
