@@ -11,6 +11,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.openttd.OpenTTD;
 import org.openttdcoop.dev.berries.openttd.spi.OpenTTDWelcome;
+import org.openttdcoop.dev.berries.password.spi.PasswordChanged;
 import org.openttdcoop.dev.grapes.plugin.PluginManager;
 import org.openttdcoop.dev.grapes.config.ConfigSection;
 import org.openttdcoop.dev.grapes.spi.*;
@@ -58,12 +59,9 @@ public class Password extends GrapePluginImpl implements Runnable, OpenTTDWelcom
     public void run()
     {
         while (true) {
-            try {
                 String newpass = getNewPass();
-                this.pm.getGrapes().getNetwork().sendAdminRcon("set network.server_password " + newpass);
-            } catch (IOException e) {
-                Logger.getLogger(OpenTTD.class.getName()).log(Level.SEVERE, e.getMessage());
-            }
+                pm.getGrapes().sendAdminRcon("set network.server_password " + newpass);
+                pm.invoke(PasswordChanged.class, newpass);
             try {
                 Thread.sleep(Integer.parseInt(config.fetch("duration")));
             } catch (InterruptedException e) {
