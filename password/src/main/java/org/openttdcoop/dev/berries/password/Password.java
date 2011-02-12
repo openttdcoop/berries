@@ -77,7 +77,6 @@ public class Password extends GrapePluginImpl implements Runnable, OpenTTDWelcom
     {
         try {
             InputStream is = getClass().getClassLoader().getResourceAsStream(config.fetch("wordfile"));
-            System.out.println(is.toString());
             InputStreamReader isr = new InputStreamReader(is);
             BufferedReader br = new BufferedReader(isr);
 
