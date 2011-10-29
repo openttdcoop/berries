@@ -4,15 +4,24 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.HashMap;
 import org.openttd.Client;
+import org.openttd.Company;
+import org.openttd.enums.AdminCompanyRemoveReason;
 import org.openttd.enums.DestType;
 import org.openttd.enums.NetworkAction;
+import org.openttd.enums.NetworkErrorCode;
 import org.openttd.network.Protocol;
 import org.openttdcoop.dev.berries.openttd.spi.OpenTTDChat;
+import org.openttdcoop.dev.berries.openttd.spi.OpenTTDClientError;
+import org.openttdcoop.dev.berries.openttd.spi.OpenTTDClientJoin;
+import org.openttdcoop.dev.berries.openttd.spi.OpenTTDClientQuit;
+import org.openttdcoop.dev.berries.openttd.spi.OpenTTDCompanyNew;
+import org.openttdcoop.dev.berries.openttd.spi.OpenTTDCompanyRemove;
 import org.openttdcoop.dev.berries.openttd.spi.OpenTTDConsole;
 import org.openttdcoop.dev.berries.openttd.spi.OpenTTDProtocol;
 import org.openttdcoop.dev.grapes.plugin.PluginManager;
 import org.openttdcoop.dev.grapes.config.ConfigSection;
 import org.openttdcoop.dev.grapes.spi.*;
+import org.pircbotx.Colors;
 import org.pircbotx.exception.IrcException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +30,7 @@ import org.slf4j.LoggerFactory;
  * Irc plugin to Grapes
  * @author Nathanael Rebsch
  */
-public class IrcPlugin extends GrapePluginImpl implements OpenTTDProtocol, OpenTTDChat, OpenTTDConsole
+public class IrcPlugin extends GrapePluginImpl implements OpenTTDProtocol, OpenTTDChat, OpenTTDConsole, OpenTTDClientJoin, OpenTTDClientQuit, OpenTTDClientError
 {
     @InjectPluginManager
     protected PluginManager pm;
@@ -70,7 +79,7 @@ public class IrcPlugin extends GrapePluginImpl implements OpenTTDProtocol, OpenT
         /* only create an example if no other definition is present */
         if (config.childrenNames().length == 0) {
             ConfigSection example = config.addChild("#example");
-
+        
             example.define("password", "", "some channels (mode +k) require a password or 'key' to join");
             example.define("autojoin", false, "join this channel automatically");
             example.define("chat.bridge", true, "enable the chat bridge between IRC and OpenTTD");
@@ -115,19 +124,40 @@ public class IrcPlugin extends GrapePluginImpl implements OpenTTDProtocol, OpenT
             return;
         }
 
+        String announcement = null;
+
         switch (action) {
-            case NETWORK_ACTION_CHAT_CLIENT:
-            case NETWORK_ACTION_CHAT_COMPANY:
+            case NETWORK_ACTION_CHAT:
+                String msg = msg = String.format("<%s> %s", client.name, message);
+
+                for (ConfigSection channel : channels.values()) {
+                    if (channel.fetch("chat.bridge", Boolean.class)) {
+                        this.ircbot.bot.sendMessage(channel.getSimpleName(), msg);
+                    }
+                }
+                return;
+
+            case NETWORK_ACTION_COMPANY_JOIN:
+                announcement = String.format("%s as joined company %d", client.name, data);
+                break;
+
+            case NETWORK_ACTION_COMPANY_NEW:
+                announcement = String.format("%s as started a new company (#%d)", client.name, data);
+                break;
+
+            case NETWORK_ACTION_COMPANY_SPECTATOR:
+                announcement = String.format("%s has joined spectators", client.name);
+                break;
+
+            case NETWORK_ACTION_GIVE_MONEY:
+                announcement = String.format("%s '%d'", message, data);
+                break;
+
+            default:
                 return;
         }
 
-        String msg = msg = String.format("<%s> %s", client.name, message);
-
-        for (ConfigSection channel : channels.values()) {
-            if (channel.fetch("chat.bridge", Boolean.class)) {
-                this.ircbot.bot.sendMessage(channel.getSimpleName(), msg);
-            }
-        }
+        this.announce(announcement);
     }
 
     @Override
@@ -143,5 +173,35 @@ public class IrcPlugin extends GrapePluginImpl implements OpenTTDProtocol, OpenT
                 }
             }
         }
+    }
+
+    private void announce(String announcement)
+    {
+        for (ConfigSection channel : channels.values()) {
+            if (channel.fetch("announcements", Boolean.class)) {
+                this.ircbot.bot.sendMessage(channel.getSimpleName(), Colors.DARK_GRAY + announcement);
+            }
+        }
+    }
+
+    @Override
+    public void onOpenTTDClientJoin(Client client)
+    {
+        String announcement = String.format("%s has joined the game (Client #%d)", client.name, client.id);
+        this.announce(announcement);
+    }
+
+    @Override
+    public void onOpenTTDClientQuit(Client client)
+    {
+        String announcement = String.format("%s has left the game (leaving)", client.name);
+        this.announce(announcement);
+    }
+
+    @Override
+    public void onOpenTTDClientError(Client client, NetworkErrorCode error)
+    {
+        String announcement = String.format("%s has left the game (%s)", client.name, error.toReadableString());
+        this.announce(announcement);
     }
 }
