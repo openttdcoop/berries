@@ -79,19 +79,28 @@ public class IrcPlugin extends GrapePluginImpl implements OpenTTDProtocol, OpenT
         /* only create an example if no other definition is present */
         if (config.childrenNames().length == 0) {
             ConfigSection example = config.addChild("#example");
-        
-            example.define("password", "", "some channels (mode +k) require a password or 'key' to join");
-            example.define("autojoin", false, "join this channel automatically");
-            example.define("chat.bridge", true, "enable the chat bridge between IRC and OpenTTD");
-            example.define("chat.cmdchar", "", "require a command char in order to bridge chat to OpenTTD\nleave blank to distribute all chat");
-            example.define("console.bridge", false, "bridge the server console");
-            example.define("console.debug", false, "bridge also debug messages");
-            example.define("rcon.enabled", false);
-            example.define("rcon.oponly", false);
-            example.define("ignorechar", "", "lines prefixed with this char will be ignored by everything this bot does\nleave empty to disable");
+            this.configSetDefaultsifMissing(example);
+        } else {
+            for (String c : config.childrenNames()) {
+                this.configSetDefaultsifMissing(config.getChild(c));
+            }
         }
 
         config.store();
+    }
+
+    private void configSetDefaultsifMissing(ConfigSection cs)
+    {
+        cs.define("password", "", "some channels (mode +k) require a password or 'key' to join");
+        cs.define("autojoin", false, "join this channel automatically");
+        cs.define("chat.bridge", true, "enable the chat bridge between IRC and OpenTTD");
+        cs.define("chat.cmdchar", "", "require a command char in order to bridge chat to OpenTTD\nleave blank to distribute all chat");
+        cs.define("console.bridge", false, "bridge the server console");
+        cs.define("console.debug", false, "bridge also debug messages");
+        cs.define("rcon.enabled", false);
+        cs.define("rcon.oponly", false);
+        cs.define("ignorechar", "", "lines prefixed with this char will be ignored by everything this bot does\nleave empty to disable");
+        cs.define("announcements", true, "send announcements in to irc (new client, new company, etc.)");
     }
 
     @Override
