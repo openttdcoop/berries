@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.HashMap;
 import org.openttd.Client;
-import org.openttd.Company;
-import org.openttd.enums.AdminCompanyRemoveReason;
 import org.openttd.enums.DestType;
 import org.openttd.enums.NetworkAction;
 import org.openttd.enums.NetworkErrorCode;
@@ -14,8 +12,6 @@ import org.openttdcoop.dev.berries.openttd.spi.OpenTTDChat;
 import org.openttdcoop.dev.berries.openttd.spi.OpenTTDClientError;
 import org.openttdcoop.dev.berries.openttd.spi.OpenTTDClientJoin;
 import org.openttdcoop.dev.berries.openttd.spi.OpenTTDClientQuit;
-import org.openttdcoop.dev.berries.openttd.spi.OpenTTDCompanyNew;
-import org.openttdcoop.dev.berries.openttd.spi.OpenTTDCompanyRemove;
 import org.openttdcoop.dev.berries.openttd.spi.OpenTTDConsole;
 import org.openttdcoop.dev.berries.openttd.spi.OpenTTDProtocol;
 import org.openttdcoop.dev.grapes.plugin.PluginManager;
@@ -147,15 +143,15 @@ public class IrcPlugin extends GrapePluginImpl implements OpenTTDProtocol, OpenT
                 return;
 
             case NETWORK_ACTION_COMPANY_JOIN:
-                announcement = String.format("%s as joined company %d", client.name, data);
+                announcement = String.format("%s as joined company #%d", highlight(client.name), data);
                 break;
 
             case NETWORK_ACTION_COMPANY_NEW:
-                announcement = String.format("%s as started a new company (#%d)", client.name, data);
+                announcement = String.format("%s as started a new company (#%d)", highlight(client.name), data);
                 break;
 
             case NETWORK_ACTION_COMPANY_SPECTATOR:
-                announcement = String.format("%s has joined spectators", client.name);
+                announcement = String.format("%s has joined spectators", highlight(client.name));
                 break;
 
             case NETWORK_ACTION_GIVE_MONEY:
@@ -192,25 +188,30 @@ public class IrcPlugin extends GrapePluginImpl implements OpenTTDProtocol, OpenT
             }
         }
     }
-
+    
+    private String highlight(String str)
+    {
+        return Colors.BOLD + str + Colors.BOLD;
+    }
+    
     @Override
     public void onOpenTTDClientJoin(Client client)
     {
-        String announcement = String.format("%s has joined the game (Client #%d)", client.name, client.id);
+        String announcement = String.format("%s has joined the game (Client #%d)", highlight(client.name), client.id);
         this.announce(announcement);
     }
 
     @Override
     public void onOpenTTDClientQuit(Client client)
     {
-        String announcement = String.format("%s has left the game (leaving)", client.name);
+        String announcement = String.format("%s has left the game (leaving)", highlight(client.name));
         this.announce(announcement);
     }
 
     @Override
     public void onOpenTTDClientError(Client client, NetworkErrorCode error)
     {
-        String announcement = String.format("%s has left the game (%s)", client.name, error.toReadableString());
+        String announcement = String.format("%s has left the game (%s)", highlight(client.name), error.toReadableString());
         this.announce(announcement);
     }
 }
