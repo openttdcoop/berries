@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -32,6 +33,8 @@ public class Password extends GrapePluginImpl implements Runnable, OpenTTDWelcom
     private List<String> passwords = new ArrayList<String>();
     private String curPass = "";
 
+    private final String RESOURCE_WORDS = "!/dictionaries/words6.txt";
+    
     @Override
     public boolean init()
     {
@@ -48,7 +51,7 @@ public class Password extends GrapePluginImpl implements Runnable, OpenTTDWelcom
     private void initConfig() throws IOException
     {
         config.define("duration", 900000);
-        config.define("wordfile", "dictionaries/words6.txt");
+        config.define("wordfile", "jar:file:${grapes/plugin.dir}./" + this.pm.getPluginDescriptor(this).getJarFile() + this.RESOURCE_WORDS);
         this.config.store();
     }
 
@@ -76,10 +79,21 @@ public class Password extends GrapePluginImpl implements Runnable, OpenTTDWelcom
     private void setMaxLines()
     {
         try {
-            InputStream is = getClass().getClassLoader().getResourceAsStream(config.fetch("wordfile"));
+            InputStream is;
+            URL resource;
+            
+            String wordfile = config.fetch("wordfile");
+            
+            if (wordfile.isEmpty()) {;
+                resource = this.pm.getPluginDescriptor(this).getResourceInsideJar(this.RESOURCE_WORDS);
+            } else {
+                resource = new URL(wordfile);
+            }
+            
+            is = resource.openStream();
+            
             InputStreamReader isr = new InputStreamReader(is);
             BufferedReader br = new BufferedReader(isr);
-
             
             String line;
 
@@ -96,7 +110,7 @@ public class Password extends GrapePluginImpl implements Runnable, OpenTTDWelcom
             br.close();
             isr.close();
             is.close();
-        } catch (IOException e) {
+        } catch (Exception e) {
             Logger.getLogger(OpenTTD.class.getName()).log(Level.WARNING, e.getMessage());
         }
     }
