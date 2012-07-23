@@ -17,8 +17,11 @@
  */
 package org.openttdcoop.dev.berries.irc;
 
+import java.util.List;
 import java.util.Set;
 import org.openttdcoop.dev.grapes.config.ConfigSection;
+import org.openttdcoop.dev.grapes.messaging.MessageContext.AccessType;
+import org.openttdcoop.dev.grapes.messaging.MessageParser;
 import org.pircbotx.Channel;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
@@ -48,11 +51,27 @@ public class IrcBot extends ListenerAdapter<PircBotX> {
         Channel channel = event.getChannel();
         User user = event.getUser();
         String message = event.getMessage();
-
+        
         ConfigSection cs = ircplugin.channels.get(channel.getName());
+        
+        IrcUser ircUser = new IrcUser(event.getUser());
+        IrcMessageProvider mp = new IrcMessageProvider(this, this.ircplugin);
+        AccessType at = AccessType.PUBLIC;
+        IrcMessageContext mc = new IrcMessageContext(mp, ircUser, event.getChannel(), event.getMessage(), at);
 
         if (this.hasCommandPrefix(cs, message)) {
-            /* Todo: Command Handling */
+            List<String> parts = MessageParser.parseCommandArguments(message.substring(1));
+                    
+            if (parts.isEmpty()) {
+                return;
+            }
+            
+            IrcCommandContext cc = new IrcCommandContext(mc);
+            cc.setArguments(parts);
+
+            String[] pluginCmd = ircplugin.pm.splitPluginCommandArguments(cc);
+
+            ircplugin.pm.execute(cc, pluginCmd[0], pluginCmd[1]);
             return;
         }
 
