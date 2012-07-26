@@ -17,16 +17,21 @@
  */
 package org.openttdcoop.dev.berries.irc;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import org.openttdcoop.dev.grapes.config.ConfigSection;
 import org.openttdcoop.dev.grapes.messaging.MessageContext.AccessType;
 import org.openttdcoop.dev.grapes.messaging.MessageParser;
 import org.pircbotx.Channel;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
+import org.pircbotx.exception.IrcException;
 import org.pircbotx.hooks.ListenerAdapter;
 import org.pircbotx.hooks.events.MessageEvent;
+import org.pircbotx.hooks.events.MotdEvent;
 import org.pircbotx.hooks.events.PrivateMessageEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,8 +40,31 @@ import org.slf4j.LoggerFactory;
  *
  * @author Nathanael Rebsch
  */
-public class IrcBot extends ListenerAdapter<PircBotX> {
+public class IrcBot extends ListenerAdapter<PircBotX>
+{
 
+    class IrcPluginConnectTask extends TimerTask
+    {
+        private IrcBot ircbot;
+        
+        public IrcPluginConnectTask(IrcBot ircbot)
+        {
+            this.ircbot = ircbot;
+        }
+
+        @Override
+        public void run()
+        {
+            try {
+                ircbot.bot.connect(ircbot.ircplugin.config.fetch("irc.host"), ircbot.ircplugin.config.fetch("irc.port", Integer.class));
+            } catch (IOException ex) {
+                ircbot.log.error("Exception trying to connect to IRC", ex);
+            } catch (IrcException ex) {
+                ircbot.log.error("Exception trying to connect to IRC", ex);
+            }
+        }
+    }
+    
     protected PircBotX bot = new PircBotX();
     private IrcPlugin ircplugin;
     private final Logger log = LoggerFactory.getLogger(IrcBot.class);
@@ -45,7 +73,23 @@ public class IrcBot extends ListenerAdapter<PircBotX> {
         this.ircplugin = ircplugin;
         bot.getListenerManager().addListener(this);
     }
+    
+    public void connect()
+    {
+        Timer t = new Timer();
+        t.schedule(new IrcPluginConnectTask(this), 0);
+    }
 
+    @Override
+    public void onMotd(MotdEvent<PircBotX> event) throws Exception
+    {
+        for (ConfigSection channel : ircplugin.channels.values()) {
+            if (channel.fetch("autojoin", boolean.class)) {
+                this.ircplugin.ircbot.bot.joinChannel(channel.getSimpleName(), channel.fetch("password"));
+            }
+        }
+    }
+    
     @Override
     public void onMessage(MessageEvent<PircBotX> event) throws Exception {
         Channel channel = event.getChannel();
