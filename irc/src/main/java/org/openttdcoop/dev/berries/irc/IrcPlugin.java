@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
  * Irc plugin to Grapes
  * @author Nathanael Rebsch
  */
+@Rename("IRC")
 public class IrcPlugin extends GrapePluginImpl implements OpenTTDProtocol, OpenTTDChat, OpenTTDConsole, OpenTTDClientJoin, OpenTTDClientQuit, OpenTTDClientError
 {
     @InjectPluginManager
