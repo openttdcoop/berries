@@ -18,7 +18,6 @@ import org.openttdcoop.dev.grapes.plugin.PluginManager;
 import org.openttdcoop.dev.grapes.config.ConfigSection;
 import org.openttdcoop.dev.grapes.spi.*;
 import org.pircbotx.Colors;
-import org.pircbotx.exception.IrcException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,24 +101,12 @@ public class IrcPlugin extends GrapePluginImpl implements OpenTTDProtocol, OpenT
     @Override
     public void onOpenTTDProtocol(Protocol protocol)
     {
-        try {
-            //this.ircbot.connect();
-            this.ircbot.bot.setVerbose(config.fetch("irc.verbose", Boolean.class));
-            this.ircbot.bot.setName(config.fetch("irc.nick"));
-            this.ircbot.bot.setLogin("grapes");
-            this.ircbot.bot.setVersion("Grapes IRC Plugin");
-            this.ircbot.bot.connect(config.fetch("irc.host"), config.fetch("irc.port", Integer.class));
-        } catch (IOException ex) {
-            log.error(ex.getMessage(), ex);
-        } catch (IrcException ex) {
-            log.error(ex.getMessage(), ex);
-        }
-
-        for (ConfigSection channel : channels.values()) {
-            if (channel.fetch("autojoin", boolean.class)) {
-                this.ircbot.bot.joinChannel(channel.getSimpleName(), channel.fetch("password"));
-            }
-        }
+        this.ircbot.bot.setVerbose(config.fetch("irc.verbose", Boolean.class));
+        this.ircbot.bot.setName(config.fetch("irc.nick"));
+        this.ircbot.bot.setLogin("grapes");
+        this.ircbot.bot.setVersion("Grapes IRC Plugin");
+        
+        this.ircbot.connect();
     }
 
     @Override
