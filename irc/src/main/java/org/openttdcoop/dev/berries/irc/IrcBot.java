@@ -126,7 +126,6 @@ public class IrcBot extends ListenerAdapter<PircBotX>
         }
 
         if (cs.fetch("console.bridge", Boolean.class)) {
-            log.error("console brige");
             ircplugin.pm.getGrapes().sendAdminRcon(event.getMessage());
             return;
         }
