@@ -19,7 +19,6 @@ package org.openttdcoop.dev.berries.irc;
 
 import org.openttdcoop.dev.grapes.messaging.MessageContext;
 import org.openttdcoop.dev.grapes.messaging.MessageContext.AccessType;
-import org.pircbotx.Channel;
 
 /**
  *
@@ -33,11 +32,11 @@ public class IrcMessageContext implements MessageContext<IrcMessageProvider, Irc
     protected final AccessType access;
     protected final String origin;
     
-    public IrcMessageContext (IrcMessageProvider mp, IrcUser user, Channel channel, String message, AccessType access)
+    public IrcMessageContext (IrcMessageProvider mp, IrcUser user, String origin, String message, AccessType access)
     {
         this.mp = mp;
         this.user = user;
-        this.origin = channel.getName();
+        this.origin = origin;
         this.message = message;
         this.access = access;
     }
