@@ -135,8 +135,6 @@ public class IrcBot extends ListenerAdapter<PircBotX>
     @Override
     public void onPrivateMessage (PrivateMessageEvent<PircBotX> event) throws Exception
     {
-        try {
-
         /* do not allow unknown users */
         if (!this.isInMyChannel(event.getUser())) {
             log.debug("User {} is in none of my channels.", event.getUser().getNick());
@@ -167,10 +165,6 @@ public class IrcBot extends ListenerAdapter<PircBotX>
         cc.setArguments(parts);
         
         ircplugin.pm.execute(cc, pluginCmd[0], pluginCmd[1]);
-        } catch (Exception ex) {
-            log.debug(ex.getMessage(), ex);
-            log.debug(ex.getCause().getMessage(), ex.getCause());
-        }
     }
 
     private boolean hasCommandPrefix (final ConfigSection cs, final String propertyName, final String message)
