@@ -15,6 +15,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+
 package org.openttdcoop.dev.berries.irc;
 
 import java.io.IOException;
@@ -42,18 +43,17 @@ import org.slf4j.LoggerFactory;
  */
 public class IrcBot extends ListenerAdapter<PircBotX>
 {
-
     class IrcPluginConnectTask extends TimerTask
     {
         private IrcBot ircbot;
-        
-        public IrcPluginConnectTask(IrcBot ircbot)
+
+        public IrcPluginConnectTask (IrcBot ircbot)
         {
             this.ircbot = ircbot;
         }
 
         @Override
-        public void run()
+        public void run ()
         {
             try {
                 ircbot.bot.connect(ircbot.ircplugin.config.fetch("irc.host"), ircbot.ircplugin.config.fetch("irc.port", Integer.class));
@@ -64,24 +64,24 @@ public class IrcBot extends ListenerAdapter<PircBotX>
             }
         }
     }
-    
     protected PircBotX bot = new PircBotX();
     private IrcPlugin ircplugin;
     private final Logger log = LoggerFactory.getLogger(IrcBot.class);
 
-    public IrcBot(IrcPlugin ircplugin) {
+    public IrcBot (IrcPlugin ircplugin)
+    {
         this.ircplugin = ircplugin;
         bot.getListenerManager().addListener(this);
     }
-    
-    public void connect()
+
+    public void connect ()
     {
         Timer t = new Timer();
         t.schedule(new IrcPluginConnectTask(this), 0);
     }
 
     @Override
-    public void onMotd(MotdEvent<PircBotX> event) throws Exception
+    public void onMotd (MotdEvent<PircBotX> event) throws Exception
     {
         for (ConfigSection channel : ircplugin.channels.values()) {
             if (channel.fetch("autojoin", boolean.class)) {
@@ -89,15 +89,16 @@ public class IrcBot extends ListenerAdapter<PircBotX>
             }
         }
     }
-    
+
     @Override
-    public void onMessage(MessageEvent<PircBotX> event) throws Exception {
+    public void onMessage (MessageEvent<PircBotX> event) throws Exception
+    {
         Channel channel = event.getChannel();
         User user = event.getUser();
         String message = event.getMessage();
-        
+
         ConfigSection cs = ircplugin.channels.get(channel.getName());
-        
+
         IrcUser ircUser = new IrcUser(event.getUser());
         IrcMessageProvider mp = new IrcMessageProvider(this, this.ircplugin);
         AccessType at = AccessType.PUBLIC;
@@ -105,11 +106,11 @@ public class IrcBot extends ListenerAdapter<PircBotX>
 
         if (this.hasCommandPrefix(cs, message)) {
             List<String> parts = MessageParser.parseCommandArguments(message.substring(1));
-                    
+
             if (parts.isEmpty()) {
                 return;
             }
-            
+
             IrcCommandContext cc = new IrcCommandContext(mc);
 
             String[] pluginCmd = ircplugin.pm.splitPluginCommandArguments(cc, parts);
@@ -132,21 +133,24 @@ public class IrcBot extends ListenerAdapter<PircBotX>
     }
 
     @Override
-    public void onPrivateMessage(PrivateMessageEvent<PircBotX> event) {
+    public void onPrivateMessage (PrivateMessageEvent<PircBotX> event)
+    {
 
         /* do not allow unknown users */
-        if (this.isInMyChannel(event.getUser())) {
+        if (!this.isInMyChannel(event.getUser())) {
             return;
         }
 
         /* Todo: Command Handling */
     }
 
-    private boolean hasCommandPrefix(final ConfigSection cs, final String message) {
+    private boolean hasCommandPrefix (final ConfigSection cs, final String message)
+    {
         return (!cs.fetch("chat.cmdchar").isEmpty() && message.trim().startsWith(cs.fetch("chat.cmdchar")));
     }
 
-    private boolean isInMyChannel(User user) {
+    private boolean isInMyChannel (User user)
+    {
         Set<Channel> userChan = user.getChannels();
 
         if (userChan.isEmpty()) {
