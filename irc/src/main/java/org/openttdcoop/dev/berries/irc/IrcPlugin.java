@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.HashMap;
 import org.openttd.Client;
+import org.openttd.RconBuffer;
+import org.openttd.StringFunc;
 import org.openttd.enums.DestType;
 import org.openttd.enums.NetworkAction;
 import org.openttd.enums.NetworkErrorCode;
@@ -14,6 +16,7 @@ import org.openttdcoop.dev.berries.openttd.spi.OpenTTDClientJoin;
 import org.openttdcoop.dev.berries.openttd.spi.OpenTTDClientQuit;
 import org.openttdcoop.dev.berries.openttd.spi.OpenTTDConsole;
 import org.openttdcoop.dev.berries.openttd.spi.OpenTTDProtocol;
+import org.openttdcoop.dev.berries.openttd.spi.OpenTTDRcon;
 import org.openttdcoop.dev.grapes.plugin.PluginManager;
 import org.openttdcoop.dev.grapes.config.ConfigSection;
 import org.openttdcoop.dev.grapes.spi.*;
@@ -26,7 +29,7 @@ import org.slf4j.LoggerFactory;
  * @author Nathanael Rebsch
  */
 @Rename("IRC")
-public class IrcPlugin extends GrapePluginImpl implements OpenTTDProtocol, OpenTTDChat, OpenTTDConsole, OpenTTDClientJoin, OpenTTDClientQuit, OpenTTDClientError
+public class IrcPlugin extends GrapePluginImpl implements OpenTTDProtocol, OpenTTDChat, OpenTTDConsole, OpenTTDClientJoin, OpenTTDClientQuit, OpenTTDClientError, OpenTTDRcon
 {
     @InjectPluginManager
     protected PluginManager pm;
@@ -164,6 +167,25 @@ public class IrcPlugin extends GrapePluginImpl implements OpenTTDProtocol, OpenT
                 if (origin.endsWith("console") || channel.fetch("console.debug", boolean.class)) {
                     this.ircbot.bot.sendMessage(channel.getSimpleName(), str);
                 }
+            }
+        }
+    }
+
+    @Override
+    public void onOpenTTDRcon(RconBuffer rconBuffer)
+    {
+        StringBuilder sb = new StringBuilder();
+        
+        for (RconBuffer.Entry rconEntry : rconBuffer) {
+            if (sb.length() > 0) {
+                sb.append("\n");
+            }
+            sb.append(rconEntry);
+        }
+        
+        for (ConfigSection channel : channels.values()) {
+            if (channel.fetch("console.bridge", Boolean.class)) {
+                this.ircbot.bot.sendMessage(channel.getSimpleName(), StringFunc.stripColour(sb.toString()));
             }
         }
     }
