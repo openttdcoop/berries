@@ -109,6 +109,7 @@ public class IrcPlugin extends GrapePluginImpl implements OpenTTDProtocol, OpenT
         this.ircbot.bot.setName(config.fetch("irc.nick"));
         this.ircbot.bot.setLogin("grapes");
         this.ircbot.bot.setVersion("Grapes IRC Plugin");
+        this.ircbot.bot.setMessageDelay(300);
         
         this.ircbot.connect();
     }
@@ -174,18 +175,11 @@ public class IrcPlugin extends GrapePluginImpl implements OpenTTDProtocol, OpenT
     @Override
     public void onOpenTTDRcon(RconBuffer rconBuffer)
     {
-        StringBuilder sb = new StringBuilder();
-        
-        for (RconBuffer.Entry rconEntry : rconBuffer) {
-            if (sb.length() > 0) {
-                sb.append("\n");
-            }
-            sb.append(rconEntry);
-        }
-        
         for (ConfigSection channel : channels.values()) {
             if (channel.fetch("console.bridge", Boolean.class)) {
-                this.ircbot.bot.sendMessage(channel.getSimpleName(), StringFunc.stripColour(sb.toString()));
+                for (RconBuffer.Entry rconEntry : rconBuffer) {
+                    this.ircbot.bot.sendMessage(channel.getSimpleName(), StringFunc.stripColour(rconEntry.message));
+                }
             }
         }
     }
