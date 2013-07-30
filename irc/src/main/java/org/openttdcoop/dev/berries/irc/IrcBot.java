@@ -111,9 +111,9 @@ public class IrcBot extends ListenerAdapter<PircBotX>
             }
             
             IrcCommandContext cc = new IrcCommandContext(mc);
-            cc.setArguments(parts);
 
-            String[] pluginCmd = ircplugin.pm.splitPluginCommandArguments(cc);
+            String[] pluginCmd = ircplugin.pm.splitPluginCommandArguments(cc, parts);
+            cc.setArguments(parts);
 
             ircplugin.pm.execute(cc, pluginCmd[0], pluginCmd[1]);
             return;
