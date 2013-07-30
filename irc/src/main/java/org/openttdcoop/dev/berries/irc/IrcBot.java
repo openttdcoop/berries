@@ -99,10 +99,10 @@ public class IrcBot extends ListenerAdapter<PircBotX>
 
         ConfigSection cs = ircplugin.channels.get(channel.getName());
 
-        IrcUser ircUser = new IrcUser(event.getUser());
+        IrcUser ircUser = new IrcUser(user);
         IrcMessageProvider mp = new IrcMessageProvider(this, this.ircplugin);
         AccessType at = AccessType.PUBLIC;
-        IrcMessageContext mc = new IrcMessageContext(mp, ircUser, event.getChannel().getName(), event.getMessage(), at);
+        IrcMessageContext mc = new IrcMessageContext(mp, ircUser, event.getChannel().getName(), message, at);
 
         if (this.hasCommandPrefix(cs, "chat.cmdchar", message)) {
             List<String> parts = MessageParser.parseCommandArguments(message.substring(1));
@@ -127,7 +127,7 @@ public class IrcBot extends ListenerAdapter<PircBotX>
         }
 
         if (cs.fetch("console.bridge", Boolean.class)) {
-            ircplugin.pm.getGrapes().sendAdminRcon(event.getMessage());
+            ircplugin.pm.getGrapes().sendAdminRcon(message);
             return;
         }
     }
@@ -135,18 +135,19 @@ public class IrcBot extends ListenerAdapter<PircBotX>
     @Override
     public void onPrivateMessage (PrivateMessageEvent<PircBotX> event) throws Exception
     {
+        User user = event.getUser();
+
         /* do not allow unknown users */
-        if (!this.isInMyChannel(event.getUser())) {
-            log.debug("User {} is in none of my channels.", event.getUser().getNick());
+        if (!this.isInMyChannel(user)) {
+            log.debug("User {} is in none of my channels.", user.getNick());
             return;
         }
 
-        User user = event.getUser();
         String message = event.getMessage();
         IrcUser ircUser = new IrcUser(user);
         IrcMessageProvider mp = new IrcMessageProvider(this, this.ircplugin);
         AccessType at = AccessType.PRIVATE;
-        IrcMessageContext mc = new IrcMessageContext(mp, ircUser, event.getUser().getNick(), event.getMessage(), at);
+        IrcMessageContext mc = new IrcMessageContext(mp, ircUser, user.getNick(), message, at);
 
         int index = 0;
         if (this.hasCommandPrefix(ircplugin.config, "irc.cmdchar", message)) {
@@ -158,12 +159,12 @@ public class IrcBot extends ListenerAdapter<PircBotX>
         if (parts.isEmpty()) {
             return;
         }
-        
+
         IrcCommandContext cc = new IrcCommandContext(mc);
 
         String[] pluginCmd = ircplugin.pm.splitPluginCommandArguments(cc, parts);
         cc.setArguments(parts);
-        
+
         ircplugin.pm.execute(cc, pluginCmd[0], pluginCmd[1]);
     }
 
@@ -171,7 +172,7 @@ public class IrcBot extends ListenerAdapter<PircBotX>
     {
         return (!cs.fetch(propertyName).isEmpty() && message.trim().startsWith(cs.fetch(propertyName)));
     }
-    
+
     private boolean isInMyChannel (User user)
     {
         Set<Channel> userChan = user.getChannels();
