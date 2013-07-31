@@ -20,7 +20,6 @@ package org.openttdcoop.dev.berries.irc;
 import java.util.List;
 import org.openttdcoop.dev.grapes.messaging.CommandContext;
 import org.openttdcoop.dev.grapes.spi.GrapeCommand;
-import org.pircbotx.Channel;
 
 /**
  *
@@ -31,7 +30,7 @@ public class IrcCommandContext extends IrcMessageContext implements CommandConte
     private String command;
     private List<String> arguments;
 
-    public IrcCommandContext (IrcMessageProvider mp, IrcUser user, Channel channel, String message, AccessType access)
+    public IrcCommandContext (IrcMessageProvider mp, IrcUser user, String channel, String message, AccessType access)
     {
         super(mp, user, channel, message, access);
     }
