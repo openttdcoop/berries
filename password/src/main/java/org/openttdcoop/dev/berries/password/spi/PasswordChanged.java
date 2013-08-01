@@ -26,5 +26,5 @@ import org.openttdcoop.dev.grapes.spi.ExtentionPoint;
  */
 public interface PasswordChanged extends ExtentionPoint
 {
-    void onPasswordChanged (String password);
+    void onPasswordChanged (PasswordChangedEvent event);
 }

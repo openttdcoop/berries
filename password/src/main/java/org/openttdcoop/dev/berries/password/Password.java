@@ -12,7 +12,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.openttd.OpenTTD;
 import org.openttdcoop.dev.berries.openttd.spi.OpenTTDWelcome;
+import org.openttdcoop.dev.berries.openttd.spi.OpenTTDWelcomeEvent;
 import org.openttdcoop.dev.berries.password.spi.PasswordChanged;
+import org.openttdcoop.dev.berries.password.spi.PasswordChangedEvent;
 import org.openttdcoop.dev.grapes.plugin.PluginManager;
 import org.openttdcoop.dev.grapes.config.ConfigSection;
 import org.openttdcoop.dev.grapes.spi.*;
@@ -64,7 +66,8 @@ public class Password extends GrapePluginImpl implements Runnable, OpenTTDWelcom
         while (true) {
                 String newpass = getNewPass();
                 pm.getGrapes().sendAdminRcon("set network.server_password " + newpass);
-                pm.invoke(PasswordChanged.class, newpass);
+                GrapeEvent event = new PasswordChangedEvent(newpass);
+                pm.invoke(PasswordChanged.class, event);
             try {
                 Thread.sleep(Integer.parseInt(config.fetch("duration")));
             } catch (InterruptedException e) {
@@ -142,7 +145,7 @@ public class Password extends GrapePluginImpl implements Runnable, OpenTTDWelcom
      * Starts the new thread for this berry once a connection is made.
      */
     @Override
-    public void onOpenTTDWelcome()
+    public void onOpenTTDWelcome(OpenTTDWelcomeEvent event)
     {
         System.out.println("Thread started");
         new Thread(this).start();
