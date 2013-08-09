@@ -8,9 +8,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.openttd.OpenTTD;
 import org.openttdcoop.dev.berries.openttd.spi.OpenTTDWelcome;
 import org.openttdcoop.dev.berries.openttd.spi.OpenTTDWelcomeEvent;
 import org.openttdcoop.dev.berries.password.spi.PasswordChanged;
@@ -18,13 +15,15 @@ import org.openttdcoop.dev.berries.password.spi.PasswordChangedEvent;
 import org.openttdcoop.dev.grapes.plugin.PluginManager;
 import org.openttdcoop.dev.grapes.config.ConfigSection;
 import org.openttdcoop.dev.grapes.spi.*;
+import org.slf4j.LoggerFactory;
 
 /**
  * Password changer plugin to Grapes
  * Changes password from a given list on set intervals.
  * @author ODM
  */
-public class Password extends GrapePluginImpl implements Runnable, OpenTTDWelcome
+@Rename("Password")
+public class PasswordPlugin extends GrapePluginImpl implements Runnable, OpenTTDWelcome
 {
     @InjectPluginManager
     protected PluginManager pm;
@@ -35,6 +34,7 @@ public class Password extends GrapePluginImpl implements Runnable, OpenTTDWelcom
     private List<String> passwords = new ArrayList<String>();
     private String curPass = "";
 
+    private final org.slf4j.Logger log = LoggerFactory.getLogger(PasswordPlugin.class);
     private final String RESOURCE_WORDS = "!/dictionaries/words6.txt";
     
     @Override
@@ -42,10 +42,12 @@ public class Password extends GrapePluginImpl implements Runnable, OpenTTDWelcom
     {
         try {
             initConfig();
+            pm.registerCommand(new PasswordCmd(this));
+            pm.registerCommand(new ResetPasswordCmd(this));
         } catch (IOException ex) {
-            Logger.getLogger(OpenTTD.class.getName()).log(Level.SEVERE, ex.getCause().getMessage(), ex.getCause());
+            this.log.error(ex.getCause().getMessage(), ex.getCause());
         }
-        setMaxLines();
+        loadPasswords();
 
         return true;
     }
@@ -64,14 +66,11 @@ public class Password extends GrapePluginImpl implements Runnable, OpenTTDWelcom
     public void run()
     {
         while (true) {
-                String newpass = getNewPass();
-                pm.getGrapes().sendAdminRcon("set network.server_password " + newpass);
-                GrapeEvent event = new PasswordChangedEvent(newpass);
-                pm.invoke(PasswordChanged.class, event);
+                setNewPassword();
             try {
                 Thread.sleep(Integer.parseInt(config.fetch("duration")));
-            } catch (InterruptedException e) {
-                Logger.getLogger(OpenTTD.class.getName()).log(Level.WARNING, e.getMessage());
+            } catch (InterruptedException ex) {
+                this.log.warn(ex.getMessage(), ex);
             }
         }
     }
@@ -79,7 +78,7 @@ public class Password extends GrapePluginImpl implements Runnable, OpenTTDWelcom
     /**
      * Read the words file and save the number of usable records.
      */
-    private void setMaxLines()
+    private void loadPasswords()
     {
         try {
             InputStream is;
@@ -113,11 +112,24 @@ public class Password extends GrapePluginImpl implements Runnable, OpenTTDWelcom
             br.close();
             isr.close();
             is.close();
-        } catch (Exception e) {
-            Logger.getLogger(OpenTTD.class.getName()).log(Level.WARNING, e.getMessage());
+        } catch (Exception ex) {
+            this.log.warn(ex.getMessage(), ex);
         }
     }
 
+    protected void setNewPassword()
+    {
+        this.setNewPassword(getNewPass());
+    }
+    
+    protected void setNewPassword(String newpass)
+    {
+        pm.getGrapes().sendAdminRcon("set network.server_password " + newpass);
+        curPass = newpass;
+        GrapeEvent event = new PasswordChangedEvent(newpass);
+        pm.invoke(PasswordChanged.class, event);
+    }
+    
     /**
      * Picks a random word from the file.
      * @return The new password.
@@ -127,9 +139,7 @@ public class Password extends GrapePluginImpl implements Runnable, OpenTTDWelcom
         Random r = new Random();
         int randint = Math.abs(r.nextInt()) % passwords.size();
 
-        curPass = passwords.get(randint);
-
-        return curPass;
+        return passwords.get(randint);
     }
 
     /**
