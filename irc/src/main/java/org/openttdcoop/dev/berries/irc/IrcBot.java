@@ -152,9 +152,17 @@ public class IrcBot extends ListenerAdapter<PircBotX>
             return;
         }
 
+        SecurityLevel sl = SecurityLevel.ANONYMOUS;
+
+        if (this.isOpInMyChannel(user)) {
+            sl = ircplugin.config.fetch("security.map.op", SecurityLevel.class);
+        } else if (this.isVoiceInMyChannel(user)) {
+            sl = ircplugin.config.fetch("security.map.voice", SecurityLevel.class);
+        }
+
         String message = event.getMessage();
         
-        IrcUser ircUser = new IrcUser(user, SecurityLevel.ANONYMOUS);
+        IrcUser ircUser = new IrcUser(user, sl);
         IrcMessageProvider mp = new IrcMessageProvider(this, this.ircplugin);
         AccessType at = AccessType.PRIVATE;
         IrcMessageContext mc = new IrcMessageContext(mp, ircUser, user.getNick(), message, at);
@@ -186,6 +194,40 @@ public class IrcBot extends ListenerAdapter<PircBotX>
     private boolean isInMyChannel (User user)
     {
         Set<Channel> userChan = user.getChannels();
+
+        if (userChan.isEmpty()) {
+            return false;
+        }
+
+        for (Channel botChan : this.bot.getChannels()) {
+            if (userChan.contains(botChan)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    
+    private boolean isOpInMyChannel (User user)
+    {
+        Set<Channel> userChan = user.getChannelsOpIn();
+
+        if (userChan.isEmpty()) {
+            return false;
+        }
+
+        for (Channel botChan : this.bot.getChannels()) {
+            if (userChan.contains(botChan)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    
+    private boolean isVoiceInMyChannel (User user)
+    {
+        Set<Channel> userChan = user.getChannelsVoiceIn();
 
         if (userChan.isEmpty()) {
             return false;
