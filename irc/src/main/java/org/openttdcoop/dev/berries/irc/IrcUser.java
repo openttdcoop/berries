@@ -18,6 +18,7 @@
 package org.openttdcoop.dev.berries.irc;
 
 import org.openttdcoop.dev.grapes.messaging.User;
+import org.openttdcoop.dev.grapes.security.SecurityLevel;
 
 /**
  *
@@ -26,10 +27,12 @@ import org.openttdcoop.dev.grapes.messaging.User;
 public class IrcUser implements User<org.pircbotx.User>
 {
     private org.pircbotx.User user;
+    private SecurityLevel sl;
 
-    public IrcUser (org.pircbotx.User user)
+    public IrcUser (org.pircbotx.User user, SecurityLevel sl)
     {
         this.user = user;
+        this.sl = sl;
     }
     
     @Override
@@ -54,6 +57,12 @@ public class IrcUser implements User<org.pircbotx.User>
     public org.pircbotx.User getRealObject()
     {
         return this.user;
+    }
+
+    @Override
+    public SecurityLevel getSecurityLevel ()
+    {
+        return this.sl;
     }
     
 }
