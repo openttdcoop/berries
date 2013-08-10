@@ -26,6 +26,7 @@ import org.openttdcoop.dev.berries.openttd.spi.OpenTTDRcon;
 import org.openttdcoop.dev.berries.openttd.spi.OpenTTDRconEvent;
 import org.openttdcoop.dev.grapes.plugin.PluginManager;
 import org.openttdcoop.dev.grapes.config.ConfigSection;
+import org.openttdcoop.dev.grapes.security.SecurityLevel;
 import org.openttdcoop.dev.grapes.spi.*;
 import org.pircbotx.Colors;
 import org.slf4j.Logger;
@@ -81,6 +82,8 @@ public class IrcPlugin extends GrapePluginImpl implements OpenTTDProtocol, OpenT
         config.define("irc.cmdchar", "!");
         config.define("nickserv.command", "", "e.g. /msg nickserv identify ${irc.nick} ${nickserv.password}");
         config.define("nickserv.password", "");
+        config.define("security.map.op", SecurityLevel.ADMIN);
+        config.define("security.map.voice", SecurityLevel.PRIVILEGED);
 
         /* only create an example if no other definition is present */
         if (config.childrenNames().length == 0) {

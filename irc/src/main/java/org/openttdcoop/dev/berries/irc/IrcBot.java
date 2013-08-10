@@ -26,6 +26,7 @@ import java.util.TimerTask;
 import org.openttdcoop.dev.grapes.config.ConfigSection;
 import org.openttdcoop.dev.grapes.messaging.MessageContext.AccessType;
 import org.openttdcoop.dev.grapes.messaging.MessageParser;
+import org.openttdcoop.dev.grapes.security.SecurityLevel;
 import org.pircbotx.Channel;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
@@ -98,8 +99,16 @@ public class IrcBot extends ListenerAdapter<PircBotX>
         String message = event.getMessage();
 
         ConfigSection cs = ircplugin.channels.get(channel.getName());
-
-        IrcUser ircUser = new IrcUser(user);
+        SecurityLevel sl = SecurityLevel.ANONYMOUS;
+        
+        
+        if (user.getChannelsOpIn().contains(channel)) {
+            sl = cs.fetch("security.map.op", SecurityLevel.class, ircplugin.config.fetch("security.map.op", SecurityLevel.class));
+        } else if (user.getChannelsVoiceIn().contains(channel)) {
+            sl = cs.fetch("security.map.voice", SecurityLevel.class, ircplugin.config.fetch("security.map.voice", SecurityLevel.class));
+        }
+        
+        IrcUser ircUser = new IrcUser(user, sl);
         IrcMessageProvider mp = new IrcMessageProvider(this, this.ircplugin);
         AccessType at = AccessType.PUBLIC;
         IrcMessageContext mc = new IrcMessageContext(mp, ircUser, event.getChannel().getName(), message, at);
@@ -144,7 +153,8 @@ public class IrcBot extends ListenerAdapter<PircBotX>
         }
 
         String message = event.getMessage();
-        IrcUser ircUser = new IrcUser(user);
+        
+        IrcUser ircUser = new IrcUser(user, SecurityLevel.ANONYMOUS);
         IrcMessageProvider mp = new IrcMessageProvider(this, this.ircplugin);
         AccessType at = AccessType.PRIVATE;
         IrcMessageContext mc = new IrcMessageContext(mp, ircUser, user.getNick(), message, at);
