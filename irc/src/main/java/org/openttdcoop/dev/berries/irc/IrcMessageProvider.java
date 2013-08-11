@@ -33,33 +33,33 @@ public class IrcMessageProvider implements MessageProvider<IrcUser>
         this.bot = bot;
         this.plugin = plugin;
     }
-    
+
     @Override
-    public String getMessageProviderName()
+    public String getMessageProviderName ()
     {
         return "IRC";
     }
 
     @Override
-    public void sendPublicMessage(String channel, String message)
+    public void sendPublicMessage (String channel, String message)
     {
         this.bot.bot.sendMessage(channel, message);
     }
 
     @Override
-    public void sendPrivateMessage(IrcUser user, String message)
+    public void sendPrivateMessage (IrcUser user, String message)
     {
         this.bot.bot.sendMessage(user.getRealObject(), message);
     }
 
     @Override
-    public void sendPublicNotice(String channel, String message)
+    public void sendPublicNotice (String channel, String message)
     {
         this.bot.bot.sendNotice(channel, message);
     }
 
     @Override
-    public void sendPrivateNotice(IrcUser user, String message)
+    public void sendPrivateNotice (IrcUser user, String message)
     {
         this.bot.bot.sendNotice(user.getRealObject(), message);
     }

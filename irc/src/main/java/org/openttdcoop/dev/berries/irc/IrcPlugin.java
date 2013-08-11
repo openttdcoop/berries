@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Irc plugin to Grapes
+ *
  * @author Nathanael Rebsch
  */
 @Rename("IRC")
@@ -36,17 +37,13 @@ public class IrcPlugin extends GrapePluginImpl implements OpenTTDProtocol, OpenT
 {
     @InjectPluginManager
     protected PluginManager pm;
-
     @InjectPluginConfig
     protected ConfigSection config;
-
     IrcBot ircbot;
-
     protected HashMap<String, ConfigSection> channels = new HashMap<String, ConfigSection>();
-    
     private final Logger log = LoggerFactory.getLogger(IrcPlugin.class);
 
-    public IrcPlugin()
+    public IrcPlugin ()
     {
         this.ircbot = new IrcBot(this);
     }
@@ -93,7 +90,7 @@ public class IrcPlugin extends GrapePluginImpl implements OpenTTDProtocol, OpenT
         config.store();
     }
 
-    private void configSetDefaultsifMissing(ConfigSection cs)
+    private void configSetDefaultsifMissing (ConfigSection cs)
     {
         cs.define("password", "", "some channels (mode +k) require a password or 'key' to join");
         cs.define("autojoin", false, "join this channel automatically");
@@ -108,7 +105,7 @@ public class IrcPlugin extends GrapePluginImpl implements OpenTTDProtocol, OpenT
     }
 
     @Override
-    public void onOpenTTDProtocol(OpenTTDProtocolEvent event)
+    public void onOpenTTDProtocol (OpenTTDProtocolEvent event)
     {
         this.ircbot.bot.setVerbose(config.fetch("irc.verbose", Boolean.class));
         this.ircbot.bot.setName(config.fetch("irc.nick"));
@@ -116,12 +113,12 @@ public class IrcPlugin extends GrapePluginImpl implements OpenTTDProtocol, OpenT
         this.ircbot.bot.setVersion("Grapes IRC Plugin");
         this.ircbot.bot.setMessageDelay(300);
         this.ircbot.bot.useShutdownHook(false);
-        
+
         this.ircbot.connect();
     }
 
     @Override
-    public void onOpenTTDChat(OpenTTDChatEvent event)
+    public void onOpenTTDChat (OpenTTDChatEvent event)
     {
         if (event.desttype != DestType.DESTTYPE_BROADCAST) {
             return;
@@ -164,10 +161,10 @@ public class IrcPlugin extends GrapePluginImpl implements OpenTTDProtocol, OpenT
     }
 
     @Override
-    public void onOpenTTDConsole(OpenTTDConsoleEvent event)
+    public void onOpenTTDConsole (OpenTTDConsoleEvent event)
     {
         String str = String.format("[%s]", event.origin);
-        str        = String.format("%-10s %s\n", str, event.message);
+        str = String.format("%-10s %s\n", str, event.message);
 
         for (ConfigSection channel : channels.values()) {
             if (channel.fetch("console.bridge", Boolean.class)) {
@@ -179,7 +176,7 @@ public class IrcPlugin extends GrapePluginImpl implements OpenTTDProtocol, OpenT
     }
 
     @Override
-    public void onOpenTTDRcon(OpenTTDRconEvent event)
+    public void onOpenTTDRcon (OpenTTDRconEvent event)
     {
         for (ConfigSection channel : channels.values()) {
             if (channel.fetch("console.bridge", Boolean.class)) {
@@ -190,7 +187,7 @@ public class IrcPlugin extends GrapePluginImpl implements OpenTTDProtocol, OpenT
         }
     }
 
-    private void announce(String announcement)
+    private void announce (String announcement)
     {
         for (ConfigSection channel : channels.values()) {
             if (channel.fetch("announcements", Boolean.class)) {
@@ -198,28 +195,28 @@ public class IrcPlugin extends GrapePluginImpl implements OpenTTDProtocol, OpenT
             }
         }
     }
-    
-    private String highlight(String str)
+
+    private String highlight (String str)
     {
         return Colors.BOLD + str + Colors.BOLD;
     }
-    
+
     @Override
-    public void onOpenTTDClientJoin(OpenTTDClientJoinEvent event)
+    public void onOpenTTDClientJoin (OpenTTDClientJoinEvent event)
     {
         String announcement = String.format("%s has joined the game (Client #%d)", highlight(event.client.name), event.client.id);
         this.announce(announcement);
     }
 
     @Override
-    public void onOpenTTDClientQuit(OpenTTDClientQuitEvent event)
+    public void onOpenTTDClientQuit (OpenTTDClientQuitEvent event)
     {
         String announcement = String.format("%s has left the game (leaving)", highlight(event.client.name));
         this.announce(announcement);
     }
 
     @Override
-    public void onOpenTTDClientError(OpenTTDClientErrorEvent event)
+    public void onOpenTTDClientError (OpenTTDClientErrorEvent event)
     {
         String announcement = String.format("%s has left the game (%s)", highlight(event.client.name), event.error.toReadableString());
         this.announce(announcement);

@@ -15,7 +15,6 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-
 package org.openttdcoop.dev.berries.irc;
 
 import java.io.IOException;
@@ -100,14 +99,14 @@ public class IrcBot extends ListenerAdapter<PircBotX>
 
         ConfigSection cs = ircplugin.channels.get(channel.getName());
         SecurityLevel sl = SecurityLevel.ANONYMOUS;
-        
-        
+
+
         if (user.getChannelsOpIn().contains(channel)) {
             sl = cs.fetch("security.map.op", SecurityLevel.class, ircplugin.config.fetch("security.map.op", SecurityLevel.class));
         } else if (user.getChannelsVoiceIn().contains(channel)) {
             sl = cs.fetch("security.map.voice", SecurityLevel.class, ircplugin.config.fetch("security.map.voice", SecurityLevel.class));
         }
-        
+
         IrcUser ircUser = new IrcUser(user, sl);
         IrcMessageProvider mp = new IrcMessageProvider(this, this.ircplugin);
         AccessType at = AccessType.PUBLIC;
@@ -161,7 +160,7 @@ public class IrcBot extends ListenerAdapter<PircBotX>
         }
 
         String message = event.getMessage();
-        
+
         IrcUser ircUser = new IrcUser(user, sl);
         IrcMessageProvider mp = new IrcMessageProvider(this, this.ircplugin);
         AccessType at = AccessType.PRIVATE;
@@ -207,7 +206,7 @@ public class IrcBot extends ListenerAdapter<PircBotX>
 
         return false;
     }
-    
+
     private boolean isOpInMyChannel (User user)
     {
         Set<Channel> userChan = user.getChannelsOpIn();
@@ -224,7 +223,7 @@ public class IrcBot extends ListenerAdapter<PircBotX>
 
         return false;
     }
-    
+
     private boolean isVoiceInMyChannel (User user)
     {
         Set<Channel> userChan = user.getChannelsVoiceIn();

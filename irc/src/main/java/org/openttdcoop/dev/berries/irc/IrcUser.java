@@ -34,27 +34,27 @@ public class IrcUser implements User<org.pircbotx.User>
         this.user = user;
         this.sl = sl;
     }
-    
+
     @Override
-    public String getName()
+    public String getName ()
     {
         return this.user.getNick();
     }
 
     @Override
-    public String getHost()
+    public String getHost ()
     {
         return this.user.getHostmask();
     }
 
     @Override
-    public String getIdentifier()
+    public String getIdentifier ()
     {
         return String.format("%s@%s", this.user.getLogin(), this.user.getHostmask());
     }
 
     @Override
-    public org.pircbotx.User getRealObject()
+    public org.pircbotx.User getRealObject ()
     {
         return this.user;
     }
@@ -64,5 +64,4 @@ public class IrcUser implements User<org.pircbotx.User>
     {
         return this.sl;
     }
-    
 }

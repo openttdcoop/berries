@@ -31,7 +31,7 @@ public class IrcMessageContext implements MessageContext<IrcMessageProvider, Irc
     protected final String message;
     protected final AccessType access;
     protected final String origin;
-    
+
     public IrcMessageContext (IrcMessageProvider mp, IrcUser user, String origin, String message, AccessType access)
     {
         this.mp = mp;
@@ -40,7 +40,7 @@ public class IrcMessageContext implements MessageContext<IrcMessageProvider, Irc
         this.message = message;
         this.access = access;
     }
-    
+
     protected IrcMessageContext (IrcMessageContext mc)
     {
         this.mp = mc.mp;
@@ -51,31 +51,31 @@ public class IrcMessageContext implements MessageContext<IrcMessageProvider, Irc
     }
 
     @Override
-    public String getMessage()
+    public String getMessage ()
     {
         return this.message;
     }
 
     @Override
-    public IrcMessageProvider getProvider()
+    public IrcMessageProvider getProvider ()
     {
         return this.mp;
     }
 
     @Override
-    public IrcUser getUser()
+    public IrcUser getUser ()
     {
         return this.user;
     }
 
     @Override
-    public AccessType getAccessType()
+    public AccessType getAccessType ()
     {
         return this.access;
     }
 
     @Override
-    public void reply(String message)
+    public void reply (String message)
     {
         if (this.access == AccessType.PRIVATE) {
             mp.sendPrivateMessage(user, message);
@@ -83,5 +83,4 @@ public class IrcMessageContext implements MessageContext<IrcMessageProvider, Irc
             this.mp.sendPublicMessage(this.origin, message);
         }
     }
-    
 }

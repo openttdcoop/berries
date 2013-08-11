@@ -46,21 +46,20 @@ public class IrcCommandContext extends IrcMessageContext implements CommandConte
     }
 
     @Override
-    public String getCommand()
+    public String getCommand ()
     {
         return this.command;
     }
 
     @Override
-    public List<String> getArguments()
+    public List<String> getArguments ()
     {
         return this.arguments;
     }
 
     @Override
-    public Class<? extends GrapeCommand> getNativeCommandType()
+    public Class<? extends GrapeCommand> getNativeCommandType ()
     {
         return IrcCommand.class;
     }
-    
 }
