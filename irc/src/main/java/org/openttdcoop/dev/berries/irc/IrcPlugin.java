@@ -120,6 +120,7 @@ public class IrcPlugin extends GrapePluginImpl implements OpenTTDProtocol, OpenT
         this.ircbot.bot.setLogin("grapes");
         this.ircbot.bot.setVersion("Grapes IRC Plugin");
         this.ircbot.bot.setMessageDelay(300);
+        this.ircbot.bot.useShutdownHook(false);
         
         this.ircbot.connect();
     }
