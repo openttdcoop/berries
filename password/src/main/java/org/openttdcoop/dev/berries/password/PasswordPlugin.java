@@ -14,6 +14,7 @@ import org.openttdcoop.dev.berries.password.spi.PasswordChanged;
 import org.openttdcoop.dev.berries.password.spi.PasswordChangedEvent;
 import org.openttdcoop.dev.grapes.plugin.PluginManager;
 import org.openttdcoop.dev.grapes.config.ConfigSection;
+import org.openttdcoop.dev.grapes.security.SecurityLevel;
 import org.openttdcoop.dev.grapes.spi.*;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +44,7 @@ public class PasswordPlugin extends GrapePluginImpl implements Runnable, OpenTTD
         try {
             initConfig();
             pm.registerCommand(new PasswordCmd(this));
-            pm.registerCommand(new ResetPasswordCmd(this));
+            pm.registerCommand(new ResetPasswordCmd(this), SecurityLevel.ADMIN);
         } catch (IOException ex) {
             this.log.error(ex.getCause().getMessage(), ex.getCause());
         }
