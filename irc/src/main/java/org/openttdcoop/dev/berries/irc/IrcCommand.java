@@ -24,4 +24,5 @@ import org.openttdcoop.dev.grapes.spi.GrapeCommand;
  * @author nathanael
  */
 public interface IrcCommand extends GrapeCommand<IrcCommandContext>
-{}
+{
+}
