@@ -1,15 +1,10 @@
 package org.openttdcoop.dev.berries.irc;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.util.HashMap;
-import org.openttd.Client;
 import org.openttd.RconBuffer;
 import org.openttd.StringFunc;
 import org.openttd.enums.DestType;
-import org.openttd.enums.NetworkAction;
-import org.openttd.enums.NetworkErrorCode;
-import org.openttd.network.Protocol;
 import org.openttdcoop.dev.berries.openttd.spi.OpenTTDChat;
 import org.openttdcoop.dev.berries.openttd.spi.OpenTTDChatEvent;
 import org.openttdcoop.dev.berries.openttd.spi.OpenTTDClientError;
@@ -136,7 +131,7 @@ public class IrcPlugin extends GrapePluginImpl implements OpenTTDProtocol, OpenT
 
         switch (event.action) {
             case NETWORK_ACTION_CHAT:
-                String msg = msg = String.format("<%s> %s", event.client.name, event.message);
+                String msg = String.format("<%s> %s", event.client.name, event.message);
 
                 for (ConfigSection channel : channels.values()) {
                     if (channel.fetch("chat.bridge", Boolean.class)) {
