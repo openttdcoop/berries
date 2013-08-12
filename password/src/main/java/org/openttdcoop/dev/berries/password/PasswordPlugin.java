@@ -52,6 +52,8 @@ public class PasswordPlugin extends GrapePluginImpl implements Runnable, OpenTTD
             initConfig();
             pm.registerCommand(new PasswordCmd(this));
             pm.registerCommand(new ResetPasswordCmd(this), SecurityLevel.ADMIN);
+            pm.registerCommand(new StopCmd(this), SecurityLevel.ADMIN);
+            pm.registerCommand(new StartCmd(this), SecurityLevel.ADMIN);
         } catch (IOException ex) {
             this.log.error(ex.getCause().getMessage(), ex.getCause());
         }
