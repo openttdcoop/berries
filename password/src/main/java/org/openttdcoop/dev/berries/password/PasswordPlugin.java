@@ -62,7 +62,7 @@ public class PasswordPlugin extends GrapePluginImpl implements Runnable, OpenTTD
 
     private void initConfig() throws IOException
     {
-        config.define("duration", 900000);
+        config.define("duration", 60);
         config.define("wordfile", "jar:file:${grapes/plugin.dir}./" + this.pm.getPluginDescriptor(this).getJarFile() + this.RESOURCE_WORDS);
         this.config.store();
     }
