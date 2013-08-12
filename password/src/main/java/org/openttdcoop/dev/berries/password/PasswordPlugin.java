@@ -8,6 +8,10 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import org.openttdcoop.dev.berries.openttd.spi.OpenTTDWelcome;
 import org.openttdcoop.dev.berries.openttd.spi.OpenTTDWelcomeEvent;
 import org.openttdcoop.dev.berries.password.spi.PasswordChanged;
@@ -37,7 +41,10 @@ public class PasswordPlugin extends GrapePluginImpl implements Runnable, OpenTTD
 
     private final org.slf4j.Logger log = LoggerFactory.getLogger(PasswordPlugin.class);
     private final String RESOURCE_WORDS = "!/dictionaries/words6.txt";
-    
+
+    protected final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+    protected ScheduledFuture<?> task;
+
     @Override
     public boolean init()
     {
@@ -66,14 +73,7 @@ public class PasswordPlugin extends GrapePluginImpl implements Runnable, OpenTTD
     @Override
     public void run()
     {
-        while (true) {
-                setNewPassword();
-            try {
-                Thread.sleep(Integer.parseInt(config.fetch("duration")));
-            } catch (InterruptedException ex) {
-                this.log.warn(ex.getMessage(), ex);
-            }
-        }
+        setNewPassword();
     }
 
     /**
@@ -158,7 +158,11 @@ public class PasswordPlugin extends GrapePluginImpl implements Runnable, OpenTTD
     @Override
     public void onOpenTTDWelcome(OpenTTDWelcomeEvent event)
     {
-        System.out.println("Thread started");
-        new Thread(this).start();
+        this.startTask();
+    }
+
+    protected void startTask ()
+    {
+        task = scheduler.scheduleAtFixedRate(this, 0, config.fetch("duration", int.class), TimeUnit.SECONDS);
     }
 }
