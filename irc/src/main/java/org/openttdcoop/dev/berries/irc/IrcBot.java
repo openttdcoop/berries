@@ -31,6 +31,7 @@ import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 import org.pircbotx.exception.IrcException;
 import org.pircbotx.hooks.ListenerAdapter;
+import org.pircbotx.hooks.events.InviteEvent;
 import org.pircbotx.hooks.events.MessageEvent;
 import org.pircbotx.hooks.events.MotdEvent;
 import org.pircbotx.hooks.events.PrivateMessageEvent;
@@ -124,7 +125,7 @@ public class IrcBot extends ListenerAdapter<PircBotX>
             String[] pluginCmd = ircplugin.pm.splitPluginCommandArguments(cc, parts);
             cc.setArguments(parts);
 
-            ircplugin.pm.execute(cc, pluginCmd[0], pluginCmd[1]);
+            ircplugin.pm.executeCommand(cc, pluginCmd[0], pluginCmd[1]);
             return;
         }
 
@@ -139,7 +140,7 @@ public class IrcBot extends ListenerAdapter<PircBotX>
             return;
         }
     }
-
+    
     @Override
     public void onPrivateMessage (PrivateMessageEvent<PircBotX> event) throws Exception
     {
@@ -182,7 +183,7 @@ public class IrcBot extends ListenerAdapter<PircBotX>
         String[] pluginCmd = ircplugin.pm.splitPluginCommandArguments(cc, parts);
         cc.setArguments(parts);
 
-        ircplugin.pm.execute(cc, pluginCmd[0], pluginCmd[1]);
+        ircplugin.pm.executeCommand(cc, pluginCmd[0], pluginCmd[1]);
     }
 
     private boolean hasCommandPrefix (final ConfigSection cs, final String propertyName, final String message)
