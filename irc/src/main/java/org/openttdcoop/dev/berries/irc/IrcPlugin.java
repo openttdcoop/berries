@@ -91,6 +91,8 @@ public class IrcPlugin extends GrapePluginImpl implements OpenTTDProtocol, OpenT
         cs.define("rcon.oponly", false);
         cs.define("ignorechar", "", "lines prefixed with this char will be ignored by everything this bot does\nleave empty to disable");
         cs.define("announcements", true, "send announcements in to irc (new client, new company, etc.)");
+        cs.define("security.map.op", "${IRC/security.map.op}");
+        cs.define("security.map.voice", "${IRC/security.map.voice}");
     }
 
     @Override
