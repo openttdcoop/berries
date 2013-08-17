@@ -37,8 +37,10 @@ public class IrcPlugin extends GrapePluginImpl implements OpenTTDProtocol, OpenT
 {
     @InjectPluginManager
     protected PluginManager pm;
+
     @InjectPluginConfig
     protected ConfigSection config;
+
     IrcBot ircbot;
     protected HashMap<String, ConfigSection> channels = new HashMap<String, ConfigSection>();
     private final Logger log = LoggerFactory.getLogger(IrcPlugin.class);
@@ -67,7 +69,7 @@ public class IrcPlugin extends GrapePluginImpl implements OpenTTDProtocol, OpenT
     private void initConfig () throws IOException
     {
         config.define("irc.host", "irc.oftc.net");
-        config.define("irc.port", 6667, "");
+        config.define("irc.port", 6667);
         config.define("irc.pass", "");
         config.define("irc.nick", "DrGrapes");
         config.define("irc.verbose", false);
