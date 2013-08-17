@@ -31,6 +31,7 @@ import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 import org.pircbotx.exception.IrcException;
 import org.pircbotx.hooks.ListenerAdapter;
+import org.pircbotx.hooks.events.JoinEvent;
 import org.pircbotx.hooks.events.MessageEvent;
 import org.pircbotx.hooks.events.MotdEvent;
 import org.pircbotx.hooks.events.PrivateMessageEvent;
@@ -56,7 +57,7 @@ public class IrcBot extends ListenerAdapter<PircBotX>
         public void run ()
         {
             try {
-                ircbot.bot.connect(ircbot.ircplugin.config.fetch("irc.host"), ircbot.ircplugin.config.fetch("irc.port", Integer.class));
+                ircbot.bot.connect(ircbot.ircplugin.config.fetch("irc.host"), ircbot.ircplugin.config.fetch("irc.port", int.class));
             } catch (IOException ex) {
                 ircbot.log.error("Exception trying to connect to IRC", ex);
             } catch (IrcException ex) {
@@ -64,6 +65,7 @@ public class IrcBot extends ListenerAdapter<PircBotX>
             }
         }
     }
+
     protected PircBotX bot = new PircBotX();
     private IrcPlugin ircplugin;
     private final Logger log = LoggerFactory.getLogger(IrcBot.class);
@@ -136,7 +138,6 @@ public class IrcBot extends ListenerAdapter<PircBotX>
 
         if (cs.fetch("console.bridge", Boolean.class)) {
             ircplugin.pm.getGrapes().sendAdminRcon(message);
-            return;
         }
     }
     
@@ -183,6 +184,14 @@ public class IrcBot extends ListenerAdapter<PircBotX>
         cc.setArguments(parts);
 
         ircplugin.pm.executeCommand(cc, pluginCmd[0], pluginCmd[1]);
+    }
+    
+    @Override
+    public void onJoin (JoinEvent<PircBotX> event)
+    {
+        if (event.getUser().equals(bot.getUserBot())) {
+            log.info("Joined Channel {}", event.getChannel().getName());
+        }
     }
 
     private boolean hasCommandPrefix (final ConfigSection cs, final String propertyName, final String message)
