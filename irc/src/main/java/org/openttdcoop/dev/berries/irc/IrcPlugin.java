@@ -61,6 +61,7 @@ public class IrcPlugin extends GrapePluginImpl implements OpenTTDProtocol, OpenT
         config.define("irc.nick", "DrGrapes");
         config.define("irc.verbose", false);
         config.define("irc.cmdchar", "!");
+        config.define("irc.message.delay", "600");
         config.define("nickserv.command", "", "e.g. /msg nickserv identify ${irc.nick} ${nickserv.password}");
         config.define("nickserv.password", "");
         config.define("security.map.op", SecurityLevel.ADMIN);
@@ -103,7 +104,7 @@ public class IrcPlugin extends GrapePluginImpl implements OpenTTDProtocol, OpenT
         this.ircbot.bot.setName(config.fetch("irc.nick"));
         this.ircbot.bot.setLogin("grapes");
         this.ircbot.bot.setVersion("Grapes IRC Plugin");
-        this.ircbot.bot.setMessageDelay(300);
+        this.ircbot.bot.setMessageDelay(config.fetch("irc.message.delay", Long.class));
         this.ircbot.bot.useShutdownHook(false);
 
         this.ircbot.connect();
