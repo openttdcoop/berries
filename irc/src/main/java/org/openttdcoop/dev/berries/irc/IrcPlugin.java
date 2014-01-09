@@ -84,6 +84,7 @@ public class IrcPlugin extends GrapePluginImpl implements OpenTTDProtocol, OpenT
         cs.define("password", "", "some channels (mode +k) require a password or 'key' to join");
         cs.define("autojoin", false, "join this channel automatically");
         cs.define("chat.bridge", true, "enable the chat bridge between IRC and OpenTTD");
+        cs.define("irc.cmdchar", "${IRC/irc.cmdchar}");
         cs.define("chat.cmdchar", "", "require a command char in order to bridge chat to OpenTTD\nleave blank to distribute all chat");
         cs.define("console.bridge", false, "bridge the server console");
         cs.define("console.debug", false, "bridge also debug messages");

@@ -114,7 +114,7 @@ public class IrcBot extends ListenerAdapter<PircBotX>
         AccessType at = AccessType.PUBLIC;
         IrcMessageContext mc = new IrcMessageContext(mp, ircUser, event.getChannel().getName(), message, at);
 
-        if (this.hasCommandPrefix(cs, "chat.cmdchar", message)) {
+        if (this.hasCommandPrefix(cs, "irc.cmdchar", message)) {
             List<String> parts = MessageParser.parseCommandArguments(message.substring(1));
 
             if (parts.isEmpty()) {
